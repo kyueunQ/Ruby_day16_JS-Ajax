@@ -177,7 +177,7 @@ btn.on('mouseover', function() {
   });
 ```
 
-
+<br>
 
 *index.html*
 
@@ -199,7 +199,7 @@ function translate(str) {
 
 ```
 
-- `d[3]` :  
+- `d[3]` :  네번째자리(d[3])가 채워져 있나 없나 물어봄
 
 <br>
 
@@ -228,7 +228,9 @@ $.ajax({
 
 
 
+<br>
 
+<br>
 
 ## 3. '좋아요' 기능 구현
 
@@ -267,11 +269,7 @@ end
 
 
 
-
-
-
-
-
+<br>
 
 ##### action명과 일치되는 js형식의 view 파일 만들기
 
@@ -286,7 +284,6 @@ end
 <button class="btn btn-info like">좋아요</button>
 <script>
 $(document).on('ready', function() {
-    // jQuery로 like 버튼을 찾기
     $('.like').on('click', function() {
         console.log("like");
         $.ajax({
@@ -296,16 +293,73 @@ $(document).on('ready', function() {
     })
 });
 </script>
+
 ```
 
 - `$(document).on('ready', function() {}` : document가 전부 로드 된 후에 javascript를 로드한다.
 
+<br>
 
+*config/routes.rb*
+
+```ruby
+Rails.application.routes.draw do
+	...
+  get '/likes/:movie_id' => 'movies#like_movie'
+  
+end
+```
+
+<br>
+
+*app/controller/movies_controller*
+
+```ruby
+class MoviesController < ApplicationController
+  before_action :js_authenticate_user!, only: [:like_movie]
+    ...
+def like_movie
+    p params
+    # 현재 유저와 params에 담긴 movie 간의
+    # 좋아요 관계를 설정한다.
+    @like = Like.where(user_id: current_user.id, movie_id: params[:movie_id]).first
+    if @like.nil?
+      @like = Like.create(user_id: current_user.id, movie_id: params[:movie_id])
+    else
+      @like.destroy
+    end
+   puts @like.frozen?
+    
+    # 만약에 현재 로그인한 유저가 이미 좋아요를 눌렀을 경우
+    # 해당 Like 인스턴스 삭제
+    # 새로 누른 경우
+    # 좋아요 관계 설정
+    # Like.create(user_id: current_user.id, movie_id: params[:movie_id])
+   
+  end
+```
+
+- `@like.destroy` 해도 db에 메모리를 차지하고 있기 때문에 
+
+<br>
 
 *views/movies/like_movie.js.erb*
 
 ```js
+if(<%= @like.frozen? %>) {
+// 좋아요가 취소된 경우  frozen? true
+// 좋아요 취소버튼 --> 좋아요 버튼
+alert("좋아요 취소");
+$('.btn').text("좋아요").toggleClass("btn-warning btn-info");
+
+} else {
+
+// 좋아요가 새로 눌린 경우 frozen? false
+// 좋아요 버튼 --> 좋아요 취소
 alert("좋아요 설정 완료");
+$('.btn').text("좋아요 취소").toggleClass("btn-info btn-warning");
+
+}
 ```
 
 
@@ -322,6 +376,5 @@ alert("좋아요 설정 완료");
 
 > Today's error 
 >
-> - 입력 값을 받아오지 못할 때 --> 
 > - 루비와 달리 javascrip는 return 값이 존재해야 함
 > - redirect_to : get방식으로 또다른 url 페이지로 넘김
