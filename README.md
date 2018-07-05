@@ -339,7 +339,9 @@ def like_movie
   end
 ```
 
-- `@like.destroy` 해도 db에 메모리를 차지하고 있기 때문에 
+- `@like.destroy` 해도 db에 메모리를 차지하고 있기 때문에 `frozen`을 통해서 존재 여부를 통해 '좋아요'가 눌려졌는지 판단할 수 있음 Returns 
+
+  (`true` if the [attributes](https://apidock.com/rails/ActiveRecord/Base/attributes) [hash](https://apidock.com/rails/ActiveRecord/Base/hash) has been frozen. )
 
 <br>
 
@@ -362,17 +364,17 @@ $('.btn').text("좋아요 취소").toggleClass("btn-info btn-warning");
 }
 ```
 
+- .toggleClass( ) = addClass( ) + removeClass( )
 
+<br>
 
-
-
-
+<br>
 
 > 참고문서
 >
 > - https://github.com/e-/Hangul.js  :  텍스트 변환기
 
-
+<br>
 
 > Today's error 
 >
